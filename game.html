@@ -1,38 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Skittles Game</title>
+  <title>Skittles Sorting Game</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
+
 <body>
   <h1>🍬 Skittles Sorting Game</h1>
   <p id="choice"></p>
 
   <div class="tube-row" id="game"></div>
 
+  <div id="winScreen" style="display:none;">
+    <h2>🎉 You sorted all the Skittles!</h2>
+    <button onclick="restart()" class="btn">Play Again</button>
+  </div>
+
   <script>
-    const flavor = localStorage.getItem("flavor");
-    document.getElementById("choice").innerText = "You voted: " + flavor;
+    const colors = ["red", "yellow", "green", "purple", "orange"];
+    const capacity = 4;
 
-    const tubes = [
-      ["red","yellow","green","purple"],
-      ["orange","red","yellow","green"],
-      [],
-      []
-    ];
-
+    let tubes = [];
     let selected = null;
 
-    function render(){
+    function initGame() {
+      let pool = [];
+
+      colors.forEach(color => {
+        for (let i = 0; i < capacity; i++) {
+          pool.push(color);
+        }
+      });
+
+      pool.sort(() => Math.random() - 0.5);
+
+      tubes = Array.from({ length: 5 }, () => []);
+
+      let i = 0;
+      while (pool.length) {
+        tubes[i % 5].push(pool.pop());
+        i++;
+      }
+
+      render();
+    }
+
+    function render() {
       const game = document.getElementById("game");
       game.innerHTML = "";
 
-      tubes.forEach((tube, i)=>{
+      tubes.forEach((tube, i) => {
         const div = document.createElement("div");
         div.className = "tube";
-        div.onclick = ()=> clickTube(i);
+        div.onclick = () => clickTube(i);
 
-        tube.forEach(c=>{
+        tube.forEach(c => {
           const candy = document.createElement("div");
           candy.className = "candy " + c;
           div.appendChild(candy);
@@ -40,20 +63,53 @@
 
         game.appendChild(div);
       });
+
+      checkWin();
     }
 
-    function clickTube(i){
-      if(selected === null){
+    function clickTube(i) {
+      if (selected === null) {
         selected = i;
       } else {
-        const candy = tubes[selected].pop();
-        if(candy) tubes[i].push(candy);
+        if (selected !== i) {
+          const from = tubes[selected];
+          const to = tubes[i];
+
+          if (from.length > 0 && to.length < capacity) {
+            const candy = from.pop();
+            to.push(candy);
+          }
+        }
         selected = null;
         render();
       }
     }
 
-    render();
+    function checkWin() {
+      const win = tubes.every(tube => {
+        if (tube.length === 0) return true;
+        if (tube.length !== capacity) return false;
+        return tube.every(c => c === tube[0]);
+      });
+
+      if (win) {
+        document.getElementById("winScreen").style.display = "block";
+
+        confetti({
+          particleCount: 150,
+          spread: 90,
+          origin: { y: 0.6 }
+        });
+      }
+    }
+
+    function restart() {
+      document.getElementById("winScreen").style.display = "none";
+      selected = null;
+      initGame();
+    }
+
+    initGame();
   </script>
 </body>
 </html>
