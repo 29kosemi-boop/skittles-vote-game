@@ -3,7 +3,7 @@ const colors = ["red","yellow","green","purple"];
 const capacity = 4;
 
 let tubes = [];
-let dragged = null;
+let selectedTube = null;
 
 function initGame() {
   let pool = [];
@@ -31,18 +31,19 @@ function render() {
   const game = document.getElementById("game");
   game.innerHTML = "";
 
-  tubes.forEach((tube, ti) => {
+  tubes.forEach((tube, i) => {
     const div = document.createElement("div");
     div.className = "tube";
 
-    div.ondragover = e => e.preventDefault();
-    div.ondrop = () => drop(ti);
+    if (selectedTube === i) {
+      div.style.outline = "3px solid black";
+    }
 
-    tube.forEach((c, ci) => {
+    div.onclick = () => handleClick(i);
+
+    tube.forEach(c => {
       const candy = document.createElement("div");
       candy.className = "candy " + c;
-      candy.draggable = false; // IMPORTANT FIX
-
       div.appendChild(candy);
     });
 
@@ -52,27 +53,37 @@ function render() {
   checkWin();
 }
 
-function drop(toTube) {
-  if (!dragged) return;
-
-  const from = tubes[dragged.fromTube];
-  const to = tubes[toTube];
-
-  if (from.length === 0) return;
-
-  // ONLY allow moving TOP candy
-  const candy = from[from.length - 1];
-
-  if (
-    to.length < capacity &&
-    (to.length === 0 || to[to.length - 1] === candy)
-  ) {
-    from.pop();
-    to.push(candy);
+function handleClick(i) {
+  if (selectedTube === null) {
+    // select source tube
+    if (tubes[i].length === 0) return;
+    selectedTube = i;
+  } else {
+    // move to target tube
+    if (selectedTube !== i) {
+      move(selectedTube, i);
+    }
+    selectedTube = null;
   }
 
-  dragged = null;
   render();
+}
+
+function move(from, to) {
+  const source = tubes[from];
+  const target = tubes[to];
+
+  if (source.length === 0) return;
+
+  const candy = source[source.length - 1];
+
+  if (
+    target.length < capacity &&
+    (target.length === 0 || target[target.length - 1] === candy)
+  ) {
+    source.pop();
+    target.push(candy);
+  }
 }
 
 function checkWin() {
@@ -81,7 +92,9 @@ function checkWin() {
   );
 
   if (win) {
-    alert("🎉 You Win!");
+    setTimeout(() => {
+      alert("🎉 You sorted all Skittles!");
+    }, 100);
   }
 }
 
