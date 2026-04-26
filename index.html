@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Skittles Vote</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>🍬 Pick a Skittles Flavor!</h1>
+
+  <div class="grid">
+    <button onclick="vote('Grape 🍇')" class="btn purple">Grape</button>
+    <button onclick="vote('Lime 🍋')" class="btn green">Lime</button>
+    <button onclick="vote('Lemon 💛')" class="btn yellow">Lemon</button>
+    <button onclick="vote('Strawberry 🍓')" class="btn red">Strawberry</button>
+    <button onclick="vote('Orange 🍊')" class="btn orange">Orange</button>
+  </div>
+
+  <p>Pick which flavor should be packaged first!</p>
+
+  <script>
+    function vote(flavor){
+      localStorage.setItem("flavor", flavor);
+      window.location.href = "game.html";
+    }
+  </script>
+</body>
+</html>

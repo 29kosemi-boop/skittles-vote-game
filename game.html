@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Skittles Game</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>🍬 Skittles Sorting Game</h1>
+  <p id="choice"></p>
+
+  <div class="tube-row" id="game"></div>
+
+  <script>
+    const flavor = localStorage.getItem("flavor");
+    document.getElementById("choice").innerText = "You voted: " + flavor;
+
+    const tubes = [
+      ["red","yellow","green","purple"],
+      ["orange","red","yellow","green"],
+      [],
+      []
+    ];
+
+    let selected = null;
+
+    function render(){
+      const game = document.getElementById("game");
+      game.innerHTML = "";
+
+      tubes.forEach((tube, i)=>{
+        const div = document.createElement("div");
+        div.className = "tube";
+        div.onclick = ()=> clickTube(i);
+
+        tube.forEach(c=>{
+          const candy = document.createElement("div");
+          candy.className = "candy " + c;
+          div.appendChild(candy);
+        });
+
+        game.appendChild(div);
+      });
+    }
+
+    function clickTube(i){
+      if(selected === null){
+        selected = i;
+      } else {
+        const candy = tubes[selected].pop();
+        if(candy) tubes[i].push(candy);
+        selected = null;
+        render();
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
