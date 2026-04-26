@@ -1,26 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Skittles Sorting Game</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      background: linear-gradient(135deg, #fff7ad, #ffa9f9);
+    }
+
+    .tube-row {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 40px;
+    }
+
+    .tube {
+      width: 60px;
+      height: 180px;
+      border: 3px solid #333;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column-reverse;
+      background: white;
+      cursor: pointer;
+    }
+
+    .candy {
+      height: 35px;
+      border-radius: 5px;
+    }
+
+    .red { background: crimson; }
+    .yellow { background: gold; }
+    .green { background: limegreen; }
+    .purple { background: purple; }
+
+    #win {
+      display: none;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      background: black;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🍬 Skittles Sorting Game</h1>
+
+<div class="tube-row" id="game"></div>
+
+<div id="win">
+  <h2>🎉 You Win!</h2>
+  <button onclick="restart()">Play Again</button>
+</div>
+
 <script>
 const colors = ["red","yellow","green","purple"];
 const capacity = 4;
 
 let tubes = [];
-let selectedTube = null;
+let selected = null;
 
 function initGame() {
-  let pool = [];
+  const colors = ["red","yellow","green","purple"];
+  const capacity = 4;
 
+  // guaranteed solvable start: each color grouped
+  let base = [];
   colors.forEach(c => {
     for (let i = 0; i < capacity; i++) {
-      pool.push(c);
+      base.push(c);
     }
   });
 
-  pool.sort(() => Math.random() - 0.5);
-
+  // distribute evenly (NOT random chaos)
   tubes = Array.from({ length: 5 }, () => []);
 
   let i = 0;
-  while (pool.length) {
-    tubes[i % 4].push(pool.pop());
+  while (base.length) {
+    tubes[i % 4].push(base.pop());
     i++;
   }
 
@@ -34,12 +103,7 @@ function render() {
   tubes.forEach((tube, i) => {
     const div = document.createElement("div");
     div.className = "tube";
-
-    if (selectedTube === i) {
-      div.style.outline = "3px solid black";
-    }
-
-    div.onclick = () => handleClick(i);
+    div.onclick = () => move(i);
 
     tube.forEach(c => {
       const candy = document.createElement("div");
@@ -53,50 +117,46 @@ function render() {
   checkWin();
 }
 
-function handleClick(i) {
-  if (selectedTube === null) {
-    // select source tube
+function move(i) {
+  if (selected === null) {
     if (tubes[i].length === 0) return;
-    selectedTube = i;
-  } else {
-    // move to target tube
-    if (selectedTube !== i) {
-      move(selectedTube, i);
-    }
-    selectedTube = null;
+    selected = i;
+    return;
   }
 
+  if (selected !== i) {
+    let from = tubes[selected];
+    let to = tubes[i];
+
+    if (from.length > 0 && to.length < capacity) {
+      let candy = from[from.length - 1];
+
+      from.pop();
+      to.push(candy);
+    }
+  }
+
+  selected = null;
   render();
 }
-
-function move(from, to) {
-  const source = tubes[from];
-  const target = tubes[to];
-
-  if (source.length === 0) return;
-
-  const candy = source[source.length - 1];
-
-  if (
-    target.length < capacity &&
-    (target.length === 0 || target[target.length - 1] === candy)
-  ) {
-    source.pop();
-    target.push(candy);
-  }
-}
-
 function checkWin() {
   const win = tubes.every(t =>
     t.length === 0 || (t.length === capacity && t.every(c => c === t[0]))
   );
 
   if (win) {
-    setTimeout(() => {
-      alert("🎉 You sorted all Skittles!");
-    }, 100);
+    document.getElementById("win").style.display = "block";
   }
+}
+
+function restart() {
+  document.getElementById("win").style.display = "none";
+  selected = null;
+  initGame();
 }
 
 initGame();
 </script>
+
+</body>
+</html>
