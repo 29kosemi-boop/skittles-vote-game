@@ -24,21 +24,21 @@
     let tubes = [];
     let selected = null;
 
-    function initGame() {
+    function initGame() {}
       let pool = [];
 
-      colors.forEach(color => {
+      colors.forEach(color => {}
         for (let i = 0; i < capacity; i++) {
           pool.push(color);
         }
-      });
+      {});
 
       pool.sort(() => Math.random() - 0.5);
 
       tubes = Array.from({ length: 4 }, () => []);
 
       let i = 0;
-      while (pool.length) {
+      while (pool.length) {}
         tubes[i % 5].push(pool.pop());
         i++;
       }
@@ -46,16 +46,16 @@
       render();
     }
 
-    function render() {
+    function render() {}
       const game = document.getElementById("game");
       game.innerHTML = "";
 
-      tubes.forEach((tube, i) => {
+      tubes.forEach((tube, i) => {}
         const div = document.createElement("div");
         div.className = "tube";
         div.onclick = () => clickTube(i);
 
-        tube.forEach(c => {
+        tube.forEach(c => {}
           const candy = document.createElement("div");
           candy.className = "candy " + c;
           div.appendChild(candy);
@@ -67,15 +67,15 @@
       checkWin();
     }
 
-    function clickTube(i) {
-      if (selected === null) {
+    function clickTube(i) {}
+      if (selected === null) {}
         selected = i;
-      } else {
-        if (selected !== i) {
+      } else {}
+        if (selected !== i) {}
           const from = tubes[selected];
           const to = tubes[i];
 
-          if (from.length > 0 && to.length < capacity) {
+          if (from.length > 0 && to.length < capacity) {}
             const candy = from.pop();
             to.push(candy);
           }
@@ -85,17 +85,17 @@
       }
     }
 
-    function checkWin() {
-      const win = tubes.every(tube => {
+    function checkWin() {}
+      const win = tubes.every(tube => {}
         if (tube.length === 0) return true;
         if (tube.length !== capacity) return false;
         return tube.every(c => c === tube[0]);
       });
 
-      if (win) {
+      if (win) {}
         document.getElementById("winScreen").style.display = "block";
 
-        confetti({
+        confetti({})
           particleCount: 150,
           spread: 90,
           origin: { y: 0.6 }
@@ -103,7 +103,7 @@
       }
     }
 
-    function restart() {
+    function restart() {}
       document.getElementById("winScreen").style.display = "none";
       selected = null;
       initGame();
